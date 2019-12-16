@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: cloud-client
+  datasource:
+    druid:
+      username: root
+      password: root
+      url: jdbc:mysql:///test1
+      driver-class-name: com.mysql.jdbc.Driver
+      initial-size: 5
+mybatis:
+  mapper-locations: classpath:/mapper/*Dao.xml
+  type-aliases-package: com.by.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+

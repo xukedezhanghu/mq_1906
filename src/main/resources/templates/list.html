@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/webjars/vue/2.6.10/dist/vue.min.js"></script>
+    <script src="/webjars/axios/0.5.4/dist/axios.min.js"></script>
+<body>
+    <div id="id">
+
+        <div id="updateList" v-if="isUpdate">
+            <input type="hidden" name="userId"   v-model="userUpdate.userId" />
+            name:
+            <input type="text"  name="userName"  v-model="userUpdate.userName" />
+            <br>
+            sex:
+            <input type="text"  name="userAge"  v-model="userUpdate.userAge" />
+            <br>
+            bir:
+            <input type="text"  name="userBir"  v-model="userUpdate.userBir" />
+            <br>
+            <button type="button"  @click="update(userUpdate)">修改</button>
+            <!--        <button type="button"  @click="quxiao">取消</button>-->
+        </div>
+        <div id="addList" v-if="isAdd">
+            <form>
+                名字:<input type="text" name="userName" v-model="userName">
+                <br>
+                性别:<input type="text" name="userAge" v-model="userSex">
+                <br>
+                bir:
+                <input type="text"  name="userSex"  v-model="userBir" />
+                <br>
+                <input type="button"  @click="addUser()" value="增加">
+            </form>
+        </div>
+        <table border="1" v-if="isList">
+            <tr>
+                <td><button v-if="isAddButt" @click="addButt">增加</button></td>
+            </tr>
+        <tr>
+            <td>id</td>
+            <td>name</td>
+            <td>age</td>
+            <td>bir</td>
+            <td>操作</td>
+        </tr>
+        <tr v-for="user in luser">
+            <td>{{user.userId}}</td>
+            <td>{{user.userName}}</td>
+            <td>{{user.userAge}}</td>
+            <td>{{user.userBir}}</td>
+            <td>
+
+                <input type="button" @click="deleteById(user.userId)" value="删除">
+                <a href="#nowhere" @click="edit(user)">编辑</a>
+            </td>
+        </tr>
+
+    </table>
+
+    </div>
+
+    <script>
+        var c=new Vue({
+            el:"#id",
+            data:{
+                luser:{
+                },
+                userId:'',
+                userName:'',
+                userSex:'',
+                userBir:'',
+                userUpdate:{
+
+                },
+                isUpdate:false,
+                isAdd:false,
+                isList:true,
+                isAddButt:true
+            },
+            mounted:function(){
+                this.users();
+            },
+            methods: {
+                users: function() {
+                    axios
+                        .get('/user/queryAll')
+                        .then(response => (
+                            console.log(response),
+                                this.luser = response.data))
+                .catch(function (error) { // 请求失败处理
+                        console.log(error);
+                    });
+                },
+                deleteById:function (a) {
+                    axios
+                        .get('/user/deleteById?userId='+a)
+                        .then(response => (
+                        c.users()))
+                        .catch(function (error) { // 请求失败处理
+                            console.log(error);
+                         })
+                },
+                addButt:function(){
+                    this.isAdd = true;
+                    this.isList = false;
+                    this.isAddButt = false
+                },
+                addUser:function () {
+                    axios.post('/user/add?userName='+this.userName+'&userAge='+this.userSex+'&userBir='+this.userBir)
+                        .then(response => (
+                        this.users(),
+                        this.isAdd = false,
+                        this.isList = true,
+                        this.isAddButt = true
+                    )
+                )
+                },
+                edit: function (user) {
+                    this.userUpdate = user;
+                    this.isUpdate = true;
+                    this.isList = false;
+                },
+                update:function (userUpdate) {
+                    axios.post('/user/update?userName='+userUpdate.userName+'&userAge='+userUpdate.userAge+'&userBir='+userUpdate.userBir+'&userId='+userUpdate.userId)
+                        .then(response => (
+                        this.users(),
+                        this.isUpdate = false,
+                        this.isList = true
+
+                    ))
+                }
+
+            },
+
+        })
+    </script>
+</body>
+</html>
